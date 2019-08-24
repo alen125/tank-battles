@@ -42,6 +42,7 @@ class BattleManager
      */
     public function startBattle(Battle $battle, array $armies) : array
     {
+        $this->writeToLog('Battle is starting at the field size of ' . $battle->getFieldSize() . ' per army');
         $army_order     = BattleHelper::randomizeArray($armies);
         /** @var Army $first_army */
         $first_army     = $army_order[0];
@@ -49,17 +50,18 @@ class BattleManager
         $second_army    = $army_order[1];
 
         $this->writeToLog($first_army->getName() . ' is the first one to attack!');
-        $end_condition = $this->determineEndCondition($first_army, $armies);
+        $end_condition = $this->determineEndCondition($armies);
 
         while (!$end_condition['end']) {
             $this->doAttack($battle, $first_army, $second_army);
-            $end_condition = $this->determineEndCondition($first_army, [$first_army, $second_army]);
+            $end_condition = $this->determineEndCondition([$first_army, $second_army]);
 
             if ($end_condition['end']) {
                 break;
             }
 
             $this->doAttack($battle, $second_army, $first_army);
+            $end_condition = $this->determineEndCondition([$first_army, $second_army]);
         }
 
         return [
@@ -116,35 +118,47 @@ class BattleManager
     /**
      *  Determine end conditions based on given values
      *
-     * @param Army $attacker
      * @param $armies
      * @return array
      */
-    protected function determineEndCondition(Army $attacker, $armies) : array
+    protected function determineEndCondition($armies) : array
     {
-        foreach ($armies as $army_name => $army_data) {
+        $result = [];
+
+        foreach ($armies as $index => $army_data) {
             /** @var Army $army_data */
 
             if ($army_data->getTankCount() <= 0) {
-                return [
-                    'attacker'  => $attacker,
-                    'defender'  => $army_data,
+                $result = [
+                    'defeated'  => $index,
                     'condition' => 'tank-count',
                     'end'       => true
                 ];
             }
 
             if ($army_data->getSupplies() <= 0) {
-                return [
-                    'attacker'  => $attacker,
-                    'defender'  => $army_data,
+                $result =  [
+                    'defeated'  => $index,
                     'condition' => 'supplies',
                     'end'       => true,
                 ];
             }
         }
 
+        if (!empty($result)) {
+            $result['winner']   = $this->getWinnerFromArmies($armies, $result['defeated']);
+            $result['defeated'] = $armies[$result['defeated']];
+            return $result;
+        }
+
         return ['end' => false];
+    }
+
+    protected function getWinnerFromArmies($armies, $defeated_army)
+    {
+        unset($armies[$defeated_army]);
+
+        return current($armies);
     }
 
     /**

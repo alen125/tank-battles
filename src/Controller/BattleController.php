@@ -79,8 +79,8 @@ class BattleController extends AbstractController
 
             return $this->render('battle.html.twig', [
                 'form'      => $form->createView(),
-                'winner'    => $battle_result['status']['attacker']->toArray(),
-                'loser'     => $battle_result['status']['defender']->toArray(),
+                'winner'    => $battle_result['status']['winner']->toArray(),
+                'loser'     => $battle_result['status']['defeated']->toArray(),
                 'condition' => $battle_result['status']['condition'],
                 'logs'      => $battle_result['logs']
             ]);

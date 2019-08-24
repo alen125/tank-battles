@@ -61,7 +61,8 @@ class BattlePreparationManager
     protected function sumAllSupplies(Army $army) : Army
     {
         // Add existing tank supplies to army total supplies
-        $total_supplies = $army->getSupplies() + ($army->getTankCount() * intval('TANK_AMMO_COUNT'));
+        $total_supplies = $army->getSupplies() + ($army->getTankCount() * intval(getenv('TANK_AMMO_COUNT')));
+
         $army->setSupplies($total_supplies);
 
         return $army;
