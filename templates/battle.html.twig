@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+        <title>Tank Battles</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="mt-2">
+                <h2>Tank battles</h2>
+            </div>
+            <div class="mt-2 mb-5">
+                {{ form_start(form, {'method': 'GET'}) }}
+                {{ form_widget(form) }}
+                <button type="submit">Battle!</button>
+                {{ form_end(form) }}
+                <br>
+                {% if logs is defined %}
+                    <h3>Battle report</h3>
+                    {% set old_action = '' %}
+                    {% for row in logs %}
+                        {% if old_action != row.action %}
+                            <hr>
+                            <h4>{{ row.action }}</h4>
+                            {% set old_action = row.action %}
+                        {% endif  %}
+                        {{ row.message }} <br>
+                    {% endfor %}
+                    <hr>
+                    <h3>Conclusion</h3>
+                    <br>
+                    <h5>{{ winner.name }} wins!!!</h5>
+                    Here is why: <br>
+                    {% if condition == 'tank-count' %}
+                        Because <b>{{ winner.name }}</b> annihilated all <b>{{ loser.name }}</b> tanks.
+                    {% else %}
+                        Because <b>{{ loser.name }}</b> lost all their supplies and ammunition to which they surrendered.
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </body>
+</html>
